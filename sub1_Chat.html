@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/main.css"/>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title"></h1>
+		</header>
+		<div class="mui-content">
+			<div id="msg">此处显示图片</div>
+		    <button type="button" id="gallery" class="mui-btn mui-btn-blue mui-btn-block">打开相册</button>
+		    <button type="button" id="camera" class="mui-btn mui-btn-green mui-btn-block">打开摄像头</button>
+		    <button type="button" id="getacc" class="mui-btn mui-btn-grey mui-btn-block">重力感应</button>
+		</div>
+		
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			mui.plusReady(function () {
+				var cw = plus.webview.currentWebview();
+				document.querySelector(".mui-title").innerHTML = cw.title;
+				
+				var msgDom = document.getElementById("msg")
+				document.getElementById("gallery").addEventListener("tap", function() {
+					plus.gallery.pick(function (path) {
+						var img = ""
+						for(var i in path.files) {
+							img +="<img width=100 height=100 src="+path.files[i]+">"
+						}
+						
+						msgDom.innerHTML = img;
+					}, function (e) {
+						msgDom.innerHTML = e.message;
+					}, {
+						filter: "image",
+						multiple: true
+					})
+				});
+				
+				document.getElementById("camera").addEventListener("tap", function () {
+					var cm = plus.camera.getCamera(1)
+					cm.captureImage(function(path) {
+						var url = "file://" + plus.io.convertLocalFileSystemURL(path);
+						var img ="<img width=100 height=100 src=" + url + ">"
+						msgDom.innerHTML = img;
+					})
+				});
+				
+				document.getElementById("getacc").addEventListener("tap", function (e) {
+					plus.accelerometer.getCurrentAcceleration(function(a) {
+						var msgDom = document.getElementById("msg");
+						msgDom.innerText = "X:" + a.xAxis + "\n Y:"
+												+ a.yAxis + "\n Z:"
+												+ a.zAxis
+					});
+				})
+			})
+		</script>
+	</body>
+
+</html>
